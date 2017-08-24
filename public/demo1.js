@@ -1,6 +1,4 @@
 
- 
-  
 onmessage = function(event) {   
   var n = Number(event.data);   
   console.log(typeof(n))
