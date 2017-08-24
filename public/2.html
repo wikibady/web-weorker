@@ -1,0 +1,28 @@
+<html>
+<title>Test threads fibonacci</title>
+
+<body>
+  <script type="text/javascript">
+    var startTime = new Date()
+    var endTime = null
+    function fbnc(num) {
+      var n = num;
+
+      if (n == 0 || n == 1) {
+       endTime = new Date()
+        return n;
+      }
+
+      for (var i = 1; i <= 2; i++) {
+
+
+        return fbnc(n - i) + fbnc(n - 2);
+      }
+    };
+    var data = fbnc(20)
+    
+    alert("Got: " + data+"\n time:"+ (endTime-startTime));
+  </script>
+</body>
+
+</html>

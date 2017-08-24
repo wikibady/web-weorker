@@ -1,16 +1,63 @@
 <html>
-    <title>Test threads fibonacci</title>
-    <body>
-    <script type="text/javascript">
-      var worker = new Worker("./fibonacci1.js");
-      worker.onmessage = function(event) {
-        alert("Got: " + event.data);
-      };
-      worker.onerror = function(error) {
-        alert("Worker error1: " + error.message);
-        throw error;
-      };
-      worker.postMessage(10);
-    </script>
-    </body>
-  </html>
+<title>web worker</title>
+<link rel="stylesheet" href="./css/bootstrap.min.css">
+<script src="./js/marked.js"></script>
+<style>
+
+  img{
+    display: block;
+    margin:10px auto;
+  }
+  #md{
+    width:100%;
+    text-align: center;
+  }
+  pre{
+    width:70%;
+    margin:10px auto;
+    text-align: left;
+    
+  }
+</style>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<body>
+  <div id="md">
+  </div>
+<script>
+  hljs.initHighlightingOnLoad();
+var mdTest = 
+"## web worker 基础学习分享 \n"+ 
+" ### 初见web worker \n" +
+"![](./img/1.png)\n" +
+"![](./img/2.png)\n "+
+"> #### 一句话：通过web worker实现多线程操作\n"+
+"[web worker不阻塞UI线程示例](./1.html)\n"+
+"## web worker 语法简介\n"+
+"#### 我们通过下面的语句来生成一个worker\n"+
+"``` javascript\n"+
+"var worker = new Worker('worker.js');\n"+
+"```\n"+
+"#### 需要注意的是，只有当url中对应的js文件加载成功后worker才会被创建\n"+
+"#### worker被创建后，独立占用一个线程，该线程和主线程之间通过message通信。\n"+
+"``` javascript\n"+
+"worker.postMessage(DATA);//主线程向worker线程发送message信息\n"+
+"worker.addEventListener('message', function(e) {//给worker添加一个message事件，用来响应从worker线程接收到的message\n"+
+" console.log('Worker said: ', e.data);\n"+
+"}, false);\n"+
+"worker.onmessage = function(e){code}//或者也可以直接这样绑定\n"+
+"```\n"+
+"#### 而在worker.js中，写法也很简单\n"+
+"``` javascript\n"+
+"onmessage = function(event) {//onmessage用来接收主线程传来的message\n"+   
+"  ...//code\n"+
+"   postMessage(n);//postMessage用来向主线程发送message\n"+
+"};\n  "+
+"```"
+document.getElementById('md').innerHTML =
+      marked(mdTest);
+</script>
+</body>
+
+</html>

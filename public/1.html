@@ -1,0 +1,34 @@
+<html>
+    <title>Demo1</title>
+    <body>
+      <div class="button" onclick="send()">点一下开始</div>
+      <div class="button" onclick="stop()">点一下暂停</div>
+      worker<div id="curNum"></div>
+      no-worker<div id="curNum2"></div>
+    <script type="text/javascript">
+      var curNum = document.getElementById("curNum");
+      var curNum2 = document.getElementById("curNum2");
+      var worker = new Worker("./demo1.js");
+      worker.onmessage = function(event) {
+        console.log(event.data)
+        curNum.innerHTML = event.data
+      };
+      worker.onerror = function(error) {
+        alert("Worker error1: " + error.message);
+        throw error;
+      };
+      function send (){
+        worker.postMessage(0);
+        var n = 0;
+        setInterval(function(){
+          n++
+          curNum2.innerHTML = n
+        },1000)
+        
+      }
+      function stop(){
+        alert('stop')
+      }
+    </script>
+    </body>
+  </html>
