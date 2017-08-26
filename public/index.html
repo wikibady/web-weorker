@@ -2,70 +2,149 @@
 <title>web worker</title>
 <link rel="stylesheet" href="./css/bootstrap.min.css">
 <link rel="stylesheet" href="./css/main.css">
-<script src="./js/marked.js"></script>
 
-<link rel="stylesheet"
-      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/agate.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
 <body>
   <div id="md">
   </div>
-<script>
-  hljs.initHighlightingOnLoad();
-var mdTest = 
-"## web worker 基础学习分享 \n"+ 
-" ### 初见web worker \n" +
-"![](./img/1.png)\n" +
-"![](./img/2.png)\n "+
-"> #### 一句话：通过web worker实现多线程操作\n"+
-"[web worker不阻塞UI线程示例](./1.html)\n"+
-"## web worker 语法简介\n"+
-"#### 我们通过下面的语句来生成一个worker\n"+
-"``` javascript\n"+
-"var worker = new Worker('worker.js');\n"+
-"```\n"+
-"#### 需要注意的是，只有当url中对应的js文件加载成功后worker才会被创建\n"+
-"#### worker被创建后，独立占用一个线程，该线程和主线程之间通过message通信。\n"+
-"``` javascript\n"+
-"worker.postMessage(DATA);//主线程向worker线程发送message信息\n"+
-"worker.addEventListener('message', function(e) {//给worker添加一个message事件，用来响应从worker线程接收到的message\n"+
-" console.log('Worker said: ', e.data);\n"+
-"}, false);\n"+
-"worker.onmessage = function(e){code}//或者也可以直接这样绑定\n"+
-"```\n"+
-"#### 而在worker.js中，写法也很简单\n"+
-"``` javascript\n"+
-"onmessage = function(event) {//onmessage用来接收主线程传来的message\n"+   
-"  ...//code\n"+
-"   postMessage(n);//postMessage用来向主线程发送message\n"+
-"};\n  "+
-"```\n"+
-"#### Web Workers 不能自行停止，但是启动它们的页面可以通过调用 terminate() 方法停止它们。\n"+
-"``` javascript\n"+
-"worker.terminate();\n"+
-"``` \n"+
-"#### Web Workers 错误信息处理可以通过onerror来监听：\n"+
-"``` js\n"+
-"worker.onerror = function (event) {\n"+
-"         console.log(event.message, event);\n"+
-"};\n"+
-"```\n"+
-"#### web worker从定义上，分为两大类 \n * 专用线程：Dedicated Worker\n * 共享线程 Shared Worker\n\n"+
-"#### 专用线程支持结构化的 JavaScript 数据格式(数组，对象)，也支持传输二进制数据。\n"+
-"#### 在这里有一点需要注意，为了高效地传输 ArrayBuffer 对象数据，需要在 postMessage 方法中的第二个参数中指定它。实例代码如下：\n"+
-"``` javascript\n"+
-"worker.postMessage({ \n"+
- " operation: 'list_all_users', \n"+
- " //ArrayBuffer object \n"+
- " input: buffer, \n"+
- " threshold: 0.8, \n"+
-"}, [buffer]);\n"+
-"``` \n"+
-"[web worker 数据传输示例](./2.html)\n"
+  <script>
+    hljs.initHighlightingOnLoad();
+    var mdTest =
+      "## web worker 基础学习分享 \n" +
+      " ### 初见web worker \n" +
+      "![](./img/1.png)\n" +
+      "![](./img/2.png)\n " +
+      "> #### 一句话：通过web worker实现多线程操作\n" +
+      "[web worker不阻塞UI线程示例](./1.html)\n" +
+      "#### 简单看看web worker的原理\n" +
+      "![](./img/3.png)\n " +
+      "#### 简单说一下worker的流程\n" +
+      "#### 1)     worker线程的创建的是异步的\n\n" +
+      "##### 代码执行到\"var worker = new Worker(task.js')\"时，在内核中构造WebCore::JSWorker对象（JSBbindings层）以及对应的WebCore::Worker对象（WebCore模块)，根据初始化的url地址\"task.js\"发起异步加载的流程；主线程代码不会阻塞在这里等待worker线程去加载、执行指定的脚本文件，而是会立即向下继续执行后面代码。\n\n" +
+      "#### 2)     postMessage消息交互由内核调度\n\n" +
+      "##### main.js中，在创建woker线程后，立即调用了postMessage方法传递了数据，在worker线程还没创建完成时，main.js中发出的消息，会先存储在一个临时消息队列中，当异步创建worker线程完成，临时消息队列中的消息数据复制到woker对应的WorkerRunLoop的消息队列中，worker线程开始处理消息。在经过一轮消息来回后，继续通信时， 这个时候因为worker线程已经创建，所以消息会直接添加到WorkerRunLoop的消息队列中；\n" +
+      "## web worker 语法简介\n" +
+      "#### 我们通过下面的语句来生成一个worker\n" +
+      "``` javascript\n" +
+      "var worker = new Worker('worker.js');\n" +
+      "```\n" +
+      "#### 需要注意的是，只有当url中对应的js文件加载成功后worker才会被创建\n" +
+      "#### worker被创建后，独立占用一个线程，该线程和主线程之间通过message通信。\n" +
+      "``` javascript\n" +
+      "worker.postMessage(DATA);//主线程向worker线程发送message信息\n" +
+      "worker.addEventListener('message', function(e) {//给worker添加一个message事件，用来响应从worker线程接收到的message\n" +
+      " console.log('Worker said: ', e.data);\n" +
+      "}, false);\n" +
+      "worker.onmessage = function(e){code}//或者也可以直接这样绑定\n" +
+      "```\n" +
+      "#### 而在worker.js中，写法也很简单\n" +
+      "``` javascript\n" +
+      "onmessage = function(event) {//onmessage用来接收主线程传来的message\n" +
+      "  ...//code\n" +
+      "   postMessage(n);//postMessage用来向主线程发送message\n" +
+      "};\n  " +
+      "```\n" +
+      "#### Web Workers 不能自行停止，但是启动它们的页面可以通过调用 terminate() 方法停止它们。\n" +
+      "``` javascript\n" +
+      "worker.terminate();\n" +
+      "self.close()//在worker中可以这样结束自己\n" +
+      "``` \n" +
+      "#### Web Workers 错误信息处理可以通过onerror来监听：\n" +
+      "``` js\n" +
+      "worker.onerror = function (event) {\n" +
+      "         console.log(event.message, event);\n" +
+      "};\n" +
+      "```\n" +
+      "#### web worker从定义上，分为两大类 \n * 专用线程：Dedicated Worker\n * 共享线程 Shared Worker\n\n" +
+      "#### 专用线程支持结构化的 JavaScript 数据格式(数组，对象)，也支持传输二进制数据。\n" +
+      "#### 在这里有一点需要注意，为了高效地传输 ArrayBuffer 对象数据，需要在 postMessage 方法中的第二个参数中指定它。实例代码如下：\n" +
+      "``` javascript\n" +
+      "worker.postMessage({ \n" +
+      " operation: 'list_all_users', \n" +
+      " //ArrayBuffer object \n" +
+      " input: buffer, \n" +
+      " threshold: 0.8, \n" +
+      "}, [buffer]);\n" +
+      "``` \n" +
+      "[web worker 数据传输示例](./2.html)\n\n" +
+      "[big data(ArrayBuffer) 高级示例](./demo/Example-6-1-BIG_data_worker.html)\n\n" +
+      "##### 主线程与子线程之间也可以交换二进制数据，比如File、Blob、ArrayBuffer等对象，也可以在线程之间发送。但是，用拷贝方式发送二进制数据，会造成性能问题。比如，主线程向子线程发送一个50MB文件，默认情况下浏览器会生成一个原文件的拷贝。为了解决这个问题，JavaScript允许主线程把二进制数据直接转移给子线程，转移后主线程无法再使用这些数据，这是为了防止出现多个线程同时修改数据的问题，这种转移数据的方法，叫做Transferable Objects。\n" +
+      "#### 和专用线程不同，共享线程可以做到不同的窗体（IFrames、浏览器标签）共用一个worker。以此来实现窗体间的数据共用。\n" +
+      "[sharedWorker示例](./demo/Example-5-1-sharedWorker.html)\n\n" +
+      "#### sharedWorker 的语法和专用worker之间稍有不同：\n\n" +
+      "``` javascript\n" +
+      "//In main\n" +
+      "var worker = new SharedWorker('Example-5-2-sharedWorker.js');//创建sharedWorker\n" +
+      "worker.port.onmessage = function(e){code...}//message事件要绑定在worker.port上，而不是直接绑定在worker上\n" +
+      "//如果用addEventListener的方式监听message事件，则需要在最后加一句 worker.port.start() 来启动通信" +
+      "```\n" +
+      "##### worker中：\n" +
+      "``` javascript\n" +
+      "//In sharedWorker\n" +
+      "self.addEventListener(\"connect\", function(e) {  \n" +
+      "   var port = e.ports[0];  \n" +
+      "   connections++;  \n" +
+      "   port.addEventListener(\"message\", function(e) {  \n" +
+      "       port.postMessage(\"Welcome to \" + e.data +\n" +
+      "		\" (On port #\" + connections + \")\");  \n" +
+      "   }, false); \n" +
+      "   port.start();  \n" +
+      "}, false);\n" +
+      "```\n" +
+      "#### 一些注意的点：\n" +
+      "##### 本地访问限制 \n" +
 
-document.getElementById('md').innerHTML =
-      marked(mdTest);
-</script>
+      "##### 由于 Google Chrome 浏览器的安全限制，Worker 无法在最新版浏览器中本地运行（例如通过 file://），且会在不显示任何提示的情况下失败！要通过 file:// 方案运行您的应用，请使用 --allow-file-access-from-files 标记设置来运行 Chrome 浏览器。请注意：不推荐使用此标记设置来运行您的主浏览器。此标记设置仅供测试用，请勿用于常规浏览\n\n" +
+      "##### worker嵌套调用\n" +
+      "##### 在firefox中可以支持在worker中调用worker，但chrome中不支持\n" +
+      "[worker重复调用demo](./3.html)\n\n" +
+      "#### worker的上下文环境 \n" +
+      "##### worker.js执行的上下文，与主页面html执行时的上下文并不相同，最顶层的对象并不是window，woker.js执行的全局上下文，是个叫做WorkerGlobalScope的东东，所以无法访问window、与window相关的DOM API，但是可以与setTimeout、setInterval等协作。\n" +
+      "##### 也就是说，出于worker自身上下文环境的限制，我们能在worker中做的事儿相对于主线程来说，十分有限：\n" +
+      "* 可以在worker中通过importScripts(url)加载另外的脚本文件\n" +
+      "* 可以使用 setTimeout(), clearTimeout(), setInterval(), and clearInterval()\n" +
+      "* 可以使用XMLHttpRequest来发送请求\n" +
+      "* 可以获取一个只读的location对象\n" +
+      "* 不能操作DOM！！！不能操作DOM！！！\n\n" +
+      "#### web Worker的使用价值：\n" +
+      "* 预先抓取和/或缓存数据以便稍后使用\n" +
+      "* 突出显示代码语法或其他实时文本格式\n" +
+      "* 拼写检查程序\n" +
+      "* 分析视频或音频数据\n" +
+      "* 背景 I/O 或网络服务轮询\n" +
+      "* 处理较大数组或超大 JSON 响应\n" +
+      "* canvas 中的图片处理\n\n" +
+      "### 搜集整理的一些web worker示例：\n"+
+      "* [地震带渲染](https://spademan.github.io/earthquake-heatmap-layer/)\n" +
+      "* [canvas图片渲染](https://nerget.com/rayjs-mt/rayjs.html)\n" +
+      "* [曼德布洛特分形图像](http://samples.msdn.microsoft.com/workshop/samples/mandelbrot/mandelbrotexplorer.html)\n" +
+      "\t [曼德布洛特图像原理](https://msdn.microsoft.com/zh-cn/library/windows/apps/xaml/jj649956.aspx)\n" +
+      "### 兼容性概览\n"+
+      " [Can-I-Use](http://caniuse.com/#search=webworker)"
+
+
+    var worker = new Worker('worker_index.js')
+    worker.onmessage = function (e) {
+
+      if (e.data.type == 'O_html') {
+        //console.log(e.data.data)
+        document.getElementById('md').innerHTML = e.data.data;
+        var codes = document.getElementsByTagName('code');
+        for (var i = 0; i < codes.length; i++) {
+          worker.postMessage({ type: 'code', data: codes[i].textContent, index: i })
+        }
+      }
+      else if (e.data.type == 'C_html') {
+        var codes = document.getElementsByTagName('code');
+        //console.log(e.data.data)
+        codes[e.data.index].innerHTML = e.data.data.value
+      }
+    }
+    worker.postMessage({ type: 'md', data: mdTest })
+  </script>
 </body>
 
 </html>

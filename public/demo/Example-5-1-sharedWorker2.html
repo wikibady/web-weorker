@@ -27,7 +27,7 @@
      <br/>var worker = new SharedWorker("jsworker.js");
      <br/>
      Our web shared Web Worker will count the connection and return the data back to our listener in this page. You might want to open the Chrome DevTools in order to see the process.
-     <a href="./Example-5-1-sharedWorker2.html" target="__BLANK">另一个页面</a>
+     
    </article>
    <output id="result"></output>
 
@@ -41,10 +41,8 @@
      worker.port.start();  
 
      // post a message to the shared Web Worker  
-     console.log("Calling the worker from script section 1");
-     worker.port.postMessage("script-1");
+     console.log("Calling the worker from script section 2");
+     worker.port.postMessage("script-2");
    </script>
-
-
  </body>
 </html>

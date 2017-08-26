@@ -1,0 +1,24 @@
+<html>
+<title>Test threads fibonacci</title>
+
+<body>
+  <input type="number" id="num">
+  <button id="btn" onclick="send()">send</button>
+  <script type="text/javascript">
+    var worker = new Worker('./fibonacci1.js');
+    worker.onerror = function(e){
+      console.log(e)
+      alert("ERR:"+e.message)
+    }
+    worker.onmessage=function(e){
+      alert(e.data)
+    }
+    function send(){
+      var nth = document.getElementById('num').value;
+      worker.postMessage(nth)
+    }
+    
+  </script>
+</body>
+
+</html>

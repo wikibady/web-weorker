@@ -23,7 +23,7 @@
           v1[i] = i;
         }
         console.log("before post to worker:",v1.buffer.byteLength)
-        worker.postMessage(v1.buffer,[v1.buffer])
+        worker.postMessage({buffer:v1.buffer,time:new Date().getTime()},[v1.buffer])
         console.log("before post to worker:",v1.buffer.byteLength)
       }
       function stop(){
